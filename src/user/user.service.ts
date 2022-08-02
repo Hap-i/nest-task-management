@@ -16,4 +16,10 @@ export class UserService {
       password: userDto.password,
     });
   }
+
+  async getUserByEmail(email: string): Promise<User> | undefined {
+    return await this.userRepository.findOne({
+      email,
+    });
+  }
 }
