@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Document, FilterQuery, Model } from 'mongoose';
 
 export abstract class EntityRepository<T extends Document> {
@@ -26,8 +27,14 @@ export abstract class EntityRepository<T extends Document> {
   }
 
   async create(createEntityData: unknown): Promise<T> {
-    const entity = new this.entityModel(createEntityData);
-    entity.save();
-    return entity;
+    try {
+      const entity = await this.entityModel.create(createEntityData);
+      entity.save();
+      return entity;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Email already exist');
+      }
+    }
   }
 }
