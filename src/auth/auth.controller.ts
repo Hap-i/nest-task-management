@@ -1,9 +1,11 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/schemas/user.schemas';
 import { AuthService } from './auth.service';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -14,6 +16,7 @@ export class AuthController {
   }
 
   @Post('signin')
+  @ApiBody({ required: true })
   async signin(
     @Body() body: { email: string; password: string },
     @Res({ passthrough: true }) response: Response,
