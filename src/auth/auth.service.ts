@@ -1,7 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/schemas/user.schemas';
 import { UserService } from 'src/user/user.service';
+import * as bcrypt from 'bcrypt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -10,33 +13,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validate(email: string, password: string): Promise<User> {
-    const user = this.userService.getUserByEmail(email);
-    if (!user) {
-      return null;
+  async signup(createUserDto: CreateUserDto): Promise<User> {
+    return await this.userService.createUser(createUserDto);
+  }
+
+  async signin(
+    email: string,
+    password: string,
+  ): Promise<{ accessToken: string }> {
+    const user = await this.userService.getUserByEmail(email);
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const payload: JwtPayload = { email };
+      const accessToken = await this.jwtService.signAsync(payload);
+      return { accessToken };
+    } else {
+      throw new UnauthorizedException('Invalid Credential');
     }
-    const IspasswordValid = password === (await user).password;
-    return IspasswordValid ? user : null;
   }
-
-  async login(user: User): Promise<{ access_token: string }> {
-    const payload = {
-      email: user.email,
-      sub: user.userId,
-    };
-
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-  }
-
-  // async verifyJwt(token: string): Promise<User> {
-  //   const decode = await this.jwtService.verify(token, {
-  //     secret: 'just-fun',
-  //   });
-
-  //   const user = this.userService.getUserByEmail(decode.email);
-  //   if (!user) throw new UnauthorizedException();
-  //   return user;
-  // }
 }
