@@ -5,7 +5,6 @@ export const swaggerDocumentOptions = new DocumentBuilder()
   .setDescription('A sample app')
   .setVersion('1.0')
   .addBearerAuth()
-  .addCookieAuth('_jwt')
   .build();
 
 export const swaggerPath = 'api';
@@ -14,7 +13,8 @@ export const swaggerSetupOptions = {
   swaggerOptions: {
     persistAuthorization: true,
   },
-  customCssUrl: '/swagger/swagger.css',
-  customfavIcon: '/swagger/favicon.png',
+  customCssUrl:
+    'https://drive.google.com/uc?export=view&id=1VLZ8ep5cr3EKwVB3WRZu8oOkmAHIO5JP',
+  // customfavIcon: './favicon.png',
   customSiteTitle: 'Sample app',
 };
