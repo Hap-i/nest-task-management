@@ -7,7 +7,7 @@ import { TaskService } from './task.service';
 
 @ApiTags('Task')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGaurd)
+// @UseGuards(JwtAuthGaurd)
 @Controller('task')
 export class TaskController extends TaskControllerBase {
   constructor(protected readonly taskService: TaskService) {
