@@ -14,10 +14,10 @@ export class TaskController extends TaskControllerBase {
     super(taskService);
   }
 
-  @Get('/:id')
-  async getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.taskService.getTaskById(id);
-  }
+  // @Get('/:id')
+  // async getTaskById(@Param('id') id: string): Promise<Task> {
+  //   return this.taskService.getTaskById(id);
+  // }
 
   // @Delete('/:id')
   // deleteTask(@Param('id') id: string): void {

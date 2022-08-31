@@ -1,5 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
-import { Document, FilterQuery, Model } from 'mongoose';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Document, FilterQuery, Model, UpdateQuery } from 'mongoose';
 
 export abstract class EntityRepository<T extends Document> {
   constructor(protected readonly entityModel: Model<T>) {}
@@ -9,8 +9,6 @@ export abstract class EntityRepository<T extends Document> {
     projection?: Record<string, unknown>,
   ): Promise<T> {
     return this.entityModel.findOne(entityFilterQuery, {
-      _id: 0,
-      __v: 0,
       ...projection,
     });
   }
@@ -20,21 +18,29 @@ export abstract class EntityRepository<T extends Document> {
     projection?: Record<string, unknown>,
   ): Promise<T[] | null> {
     return this.entityModel.find(entityFilterQuery, {
-      _id: 0,
-      __v: 0,
       ...projection,
     });
   }
 
   async create(createEntityData: unknown): Promise<T> {
-    try {
-      const entity = await this.entityModel.create(createEntityData);
-      entity.save();
-      return entity;
-    } catch (error) {
-      if (error.code === 11000) {
-        throw new BadRequestException('Email already exist');
-      }
+    const entity = await this.entityModel.create(createEntityData);
+    entity.save();
+    return entity;
+  }
+  async findOneAndUpdate(filterQuery: FilterQuery<T>, update: UpdateQuery<T>) {
+    const document = await this.entityModel.findOneAndUpdate(
+      filterQuery,
+      update,
+      {
+        lean: true,
+        new: true,
+      },
+    );
+
+    if (!document) {
+      throw new NotFoundException('Document not found.');
     }
+
+    return document;
   }
 }
